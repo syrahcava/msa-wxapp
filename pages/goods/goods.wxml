@@ -1,0 +1,151 @@
+<scroll-view class="container" scroll-y="true">
+  <view wx:if="{{!openAttr}}">
+    <swiper class="goodsimgs" indicator-dots="true" autoplay="true" interval="3000" duration="1000">
+      <swiper-item wx:for="{{gallery}}" wx:key="{{item.id}}">
+        <image src="{{item.original}}" background-size="cover"></image>
+      </swiper-item>
+    </swiper>
+    <view class="service-policy">
+      <view class="item">30天无忧退货</view>
+      <view class="item">48小时快速退款</view>
+      <view class="item">满88元免邮费</view>
+    </view>
+    <view class="goods-info">
+      <view class="c">
+        <text class="name">{{goods.title}}</text>
+        <!-- <text class="desc">{{goods.description}}</text> -->
+        <rich-text class="desc" nodes="{{goods.description}}"></rich-text>
+        <text class="price">￥{{goods.price.incl_tax}}</text>
+        <view class="brand" wx:if="{{brand.name}}">
+          <navigator url="../brandDetail/brandDetail?id={{brand.brandId}}">
+            <text>{{brand.name}}</text>
+          </navigator>
+        </view>
+      </view>
+    </view>
+    <view class="comments" wx:if="{{comment.count > 0}}">
+      <view class="h">
+        <navigator url="../comment/comment?valueId={{goods.id}}&typeId=0">
+          <text class="t">评价({{comment.count > 999 ? '999+' : comment.count}})</text>
+          <text class="i">查看全部</text>
+        </navigator>
+      </view>
+      <view class="b">
+        <view class="item">
+          <view class="info">
+            <view class="user">
+              <image src="{{comment.data.avatar}}"></image>
+              <text>{{comment.data.nickname}}</text>
+            </view>
+            <view class="time">{{comment.data.add_time}}</view>
+          </view>
+          <view class="content">
+            {{comment.data.content}}
+          </view>
+          <view class="imgs" wx:if="{{comment.data.pic_list.length > 0}}">
+            <image class="img" wx:for="{{comment.data.pic_list}}" wx:key="{{item.id}}" src="{{item.pic_url}}"></image>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="goods-attr">
+      <view class="t">商品参数</view>
+      <view class="l">
+        <view class="item" wx:for="{{attribute}}" wx:key="{{item.name}}">
+          <text class="left">{{item.name}}</text>
+          <text class="right">{{item.value}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="detail">
+      <import src="../../lib/wxParse/wxParse.wxml" />
+      <template is="wxParse" data="{{wxParseData:goodsDetail.nodes}}" />
+    </view>
+
+    <view class="common-problem">
+      <view class="h">
+        <view class="line"></view>
+        <text class="title">常见问题</text>
+      </view>
+      <view class="b">
+        <view class="item" wx:for="{{issueList}}" wx:key="{{item.id}}">
+          <view class="question-box">
+            <text class="spot"></text>
+            <text class="question">{{item.question}}</text>
+          </view>
+          <view class="answer">
+            {{item.answer}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="related-goods" wx:if="{{relatedGoods.length > 0}}">
+      <view class="h">
+        <view class="line"></view>
+        <text class="title">大家都在看</text>
+      </view>
+      <view class="b">
+        <view class="item" wx:for="{{relatedGoods}}" wx:key="{{item.id}}">
+          <navigator url="/pages/goods/goods?id={{item.id}}">
+            <image class="img" src="{{item.list_pic_url}}" background-size="cover"></image>
+            <text class="name">{{item.name}}</text>
+            <text class="price">￥{{item.retail_price}}</text>
+          </navigator>
+        </view>
+      </view>
+    </view>
+
+  </view>
+  <!--弹窗-->
+  <view class="drawer_screen" catchtap="setModalStatus" data-status="0" wx:if="{{showModalStatus}}"></view>
+  <view animation="{{animationData}}" class="drawer_attr_box" wx:if="{{showModalStatus}}">
+    <view class="close_icon" bindtap="setModalStatus" data-status="0">×</view>
+    <view class="drawer_attr_content">
+      <view class="text_center">
+        <image class="drawer_image" src="{{goods.primary_image.original}}"></image>
+        <view class="mingcheng">
+          <view>{{goods.title}}</view>
+          <view style="font-size:29rpx;color:red">¥ {{goods.price.incl_tax}}</view>
+        </view>
+      </view>
+      <view class="commodity_attr_list">
+        <view class="attr_box">
+          <view class="attr_name">规格</view>
+          <view class="attr_value_box">
+            <view class="attr_value {{choice.id==selectedProduct ?'attr_value_active':''}}" bindtap="selectAttrValue" data-value="{{choice.id}}" data-text="{{choice.value}}" wx:for="{{goods.choices}}" wx:for-item="choice" wx:for-index="valueIndex" wx:key="{{choice.id}}">
+              {{choice.value}}
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="shu">
+        <text class="cun">购买数量</text>
+        <view class="dian">
+          <view class="stepper">
+            <!-- 减号 -->
+            <text class="normal" data-alpha-beta="0" bindtap="changeNum">-</text>
+            <!-- 数值 -->
+            <view class="nownum">{{buynum}}</view>
+            <!-- 加号 -->
+            <text class="normal" data-alpha-beta="1" bindtap="changeNum">+</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  <view class="bottom-btn">
+    <view class="l l-collect" bindtap="closeAttrOrCollect">
+      <image class="icon" src="{{ collectBackImage }}"></image>
+    </view>
+    <view class="l l-cart">
+      <view class="box">
+        <text class="cart-count">{{cartGoodsCount}}</text>
+        <image bindtap="openCartPage" class="icon" src="/static/images/ic_menu_shoping_nor.png"></image>
+      </view>
+    </view>
+    <view class="c">立即购买</view>
+    <view class="r" bindtap="addToCart">加入购物车</view>
+  </view>
+</scroll-view>
